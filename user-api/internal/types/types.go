@@ -14,3 +14,12 @@ type LoginResp struct {
 	Token    string `json:"token"`
 	ExpireAt string `json:"expireAt"`
 }
+
+type UpdateReq struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type UpdateResp struct {
+	Success int64 `json:"success"`
+}

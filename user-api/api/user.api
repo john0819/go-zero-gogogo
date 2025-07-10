@@ -13,11 +13,25 @@ type (
 		Token    string `json:"token"`
 		ExpireAt string `json:"expireAt"`
 	}
+	// update相关的
+	UpdateReq {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	// 定义登录接口的响应体
+	UpdateResp {
+		Success int64 `json:"success"`
+	}
 )
 
 // 定义 HTTP 服务
-// 微服务名称为 user，生成的代码目录和配置文件将和 user 值相关
+// 将handler放在某个分组文件夹下
+@server (
+	group:  user
+	prefix: userapi/v1
+)
 service user {
+	@doc "获取用户信息"
 	// 定义 http.HandleFunc 转换的 go 文件名称及方法
 	@handler Login
 	// 定义接口
@@ -26,5 +40,8 @@ service user {
 	// 请求体为 LoginReq
 	// 响应体为 LoginResp，响应体必须有 returns 关键字修饰
 	post /user/login (LoginReq) returns (LoginResp)
+
+	@handler Update
+	post /user/update (UpdateReq) returns (UpdateResp)
 }
 

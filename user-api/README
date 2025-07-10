@@ -1,0 +1,3 @@
+1. 服务级别的ctx, 用来存储一些module(比如中间件)
+svc.NewServiceContext(c)
+通过config进行module的初始化, 后续就可以通过ctx来获取module应用
