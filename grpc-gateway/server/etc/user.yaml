@@ -1,6 +1,5 @@
-Name: user
-Host: 0.0.0.0
-Port: 8888
+Name: user.rpc
+ListenOn: 0.0.0.0:8080
 
 Prometheus:
   Host: 0.0.0.0

@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # go-zero user-api 监控
+  - job_name: 'user-api'
+    static_configs:
+      - targets: ['host.docker.internal:9091']  # user-api prometheus端口
+    scrape_interval: 5s
+    metrics_path: /metrics
+
+  # go-zero user-rpc 监控  
+  # - job_name: 'user-rpc'
+  #   static_configs:
+  #     - targets: ['host.docker.internal:9092']  # user-rpc prometheus端口
+  #   scrape_interval: 5s
+  #   metrics_path: /metrics
+
+  # Prometheus 自监控
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090'] 

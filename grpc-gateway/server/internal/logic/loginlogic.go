@@ -1,11 +1,10 @@
-package user
+package logic
 
 import (
 	"context"
-	"time"
 
-	"zero-demo/user-api/internal/svc"
-	"zero-demo/user-api/internal/types"
+	"zero-demo/grpc-gateway/server/internal/svc"
+	"zero-demo/grpc-gateway/server/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/metric"
@@ -24,43 +23,33 @@ var (
 )
 
 type LoginLogic struct {
-	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
+	logx.Logger
 }
 
-// 获取用户信息
 func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic {
 	return &LoginLogic{
-		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
+		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
+func (l *LoginLogic) Login(in *user.UserReq) (*user.UserResp, error) {
 	userMap := map[string]string{
-		"john":  "123",
-		"stone": "456",
-		"hyx":   "789",
+		"1": "john",
+		"2": "wong",
 	}
 
-	if _, ok := userMap[req.Username]; !ok {
+	if _, ok := userMap[in.Uid]; !ok {
 		loginCounter.Inc("failed")
 		return nil, status.Errorf(codes.NotFound, "user not found")
 	}
 
 	loginCounter.Inc("success")
 
-	number := "unknown"
-	if n, ok := userMap[req.Username]; ok {
-		number = n
-	}
-
-	return &types.LoginResp{
-		Id:       1,
-		Name:     number,
-		Token:    "token",
-		ExpireAt: time.Now().Add(time.Hour * 24).Format(time.RFC3339),
+	return &user.UserResp{
+		Name: userMap[in.Uid],
 	}, nil
 }

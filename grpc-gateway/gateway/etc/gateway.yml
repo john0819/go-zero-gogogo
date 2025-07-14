@@ -1,0 +1,12 @@
+Name: user-gateway
+Host: localhost
+Port: 8888
+Upstreams:
+  - Grpc:
+      Target: localhost:8080
+    ProtoSets:
+      - user.pb
+    Mappings:
+      - Method: post
+        Path: /user/login
+        RpcPath: user.UserService/Login
