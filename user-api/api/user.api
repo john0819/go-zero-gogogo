@@ -3,6 +3,7 @@ syntax = "v1"
 type (
 	// 定义登录接口的请求体
 	LoginReq {
+		Id       int64  `json:"id"`
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}

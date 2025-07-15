@@ -21,4 +21,4 @@ passwd=root
 
 echo "开始创建库：$dbname 的表：$tables"
 # 可以使用-home指定模版路径，默认是~/.goctl
-goctl model mysql datasource -url="${username}:${passwd}@tcp(${host}:${port})/${dbname}" -table="${tables}"  -dir="${modeldir}" -cache=false --style=goZero
+goctl model mysql datasource -url="${username}:${passwd}@tcp(${host}:${port})/${dbname}" -table="${tables}"  -dir="${modeldir}" -cache=true --style=goZero

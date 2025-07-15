@@ -1,8 +1,13 @@
-package genModel
+package model
 
-import "github.com/zeromicro/go-zero/core/stores/sqlx"
+import (
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
+)
 
-var _ UserModel = (*customUserModel)(nil)
+var (
+	ErrNotFound           = sqlx.ErrNotFound
+	_           UserModel = (*customUserModel)(nil)
+)
 
 type (
 	// UserModel is an interface to be customized, add more methods here,

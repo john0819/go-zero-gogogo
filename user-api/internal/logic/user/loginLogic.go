@@ -2,15 +2,15 @@ package user
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"zero-demo/user-api/internal/svc"
 	"zero-demo/user-api/internal/types"
+	"zero-demo/user-api/model"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/metric"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -39,27 +39,14 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
-	userMap := map[string]string{
-		"john":  "123",
-		"stone": "456",
-		"hyx":   "789",
-	}
-
-	if _, ok := userMap[req.Username]; !ok {
-		loginCounter.Inc("failed")
-		return nil, status.Errorf(codes.NotFound, "user not found")
-	}
-
-	loginCounter.Inc("success")
-
-	number := "unknown"
-	if n, ok := userMap[req.Username]; ok {
-		number = n
+	user, err := l.svcCtx.UserModel.FindOne(l.ctx, uint64(req.Id))
+	if err != nil && err != model.ErrNotFound {
+		return nil, errors.New("user not found")
 	}
 
 	return &types.LoginResp{
-		Id:       1,
-		Name:     number,
+		Id:       int64(user.Id),
+		Name:     user.Name.String,
 		Token:    "token",
 		ExpireAt: time.Now().Add(time.Hour * 24).Format(time.RFC3339),
 	}, nil
