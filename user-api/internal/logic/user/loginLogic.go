@@ -66,6 +66,11 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 	}
 }
 
+func (l *LoginLogic) AnonymousFunc(ctx context.Context, fn func() error) error {
+	logc.Infof(ctx, "进入匿名函数")
+	return fn()
+}
+
 func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
 	logc.Infof(l.ctx, "enter login logic")
 	logc.Infof(l.ctx, "querying user with ID: %d", req.Id)
@@ -73,6 +78,12 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 	// 分布式追踪 - 创建span用于业务逻辑追踪
 	_, span := tracer.Start(l.ctx, "user.login")
 	defer span.End()
+
+	// 匿名函数的使用
+	l.AnonymousFunc(l.ctx, func() error {
+		logc.Infof(l.ctx, "我要使用匿名函数!!")
+		return nil
+	})
 
 	// redis LOCK
 	rdsLockKey := fmt.Sprintf("user:%d", req.Id)
