@@ -29,9 +29,12 @@ var (
 type (
 	userModel interface {
 		Insert(ctx context.Context, data *User) (sql.Result, error)
+		TransactInsert(ctx context.Context, session sqlx.Session, data *User) (sql.Result, error)
 		FindOne(ctx context.Context, id uint64) (*User, error)
 		Update(ctx context.Context, data *User) error
 		Delete(ctx context.Context, id uint64) error
+		// transaction
+		TransactCtx(ctx context.Context, fn func(ctx context.Context, session sqlx.Session) error) error
 	}
 
 	defaultUserModel struct {
@@ -79,6 +82,15 @@ func (m *defaultUserModel) FindOne(ctx context.Context, id uint64) (*User, error
 	}
 }
 
+func (m *defaultUserModel) TransactInsert(ctx context.Context, session sqlx.Session, data *User) (sql.Result, error) {
+	looklookUsercenterUserIdKey := fmt.Sprintf("%s%v", cacheLooklookUsercenterUserIdPrefix, data.Id)
+	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?)", m.table, userRowsExpectAutoSet)
+		return session.ExecCtx(ctx, query, data.Name, data.Password)
+	}, looklookUsercenterUserIdKey)
+	return ret, err
+}
+
 func (m *defaultUserModel) Insert(ctx context.Context, data *User) (sql.Result, error) {
 	looklookUsercenterUserIdKey := fmt.Sprintf("%s%v", cacheLooklookUsercenterUserIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
@@ -108,4 +120,10 @@ func (m *defaultUserModel) queryPrimary(ctx context.Context, conn sqlx.SqlConn, 
 
 func (m *defaultUserModel) tableName() string {
 	return m.table
+}
+
+func (m *defaultUserModel) TransactCtx(ctx context.Context, fn func(ctx context.Context, session sqlx.Session) error) error {
+	return m.CachedConn.TransactCtx(ctx, func(ctx context.Context, session sqlx.Session) error {
+		return fn(ctx, session)
+	})
 }

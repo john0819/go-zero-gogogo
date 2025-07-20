@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/metric"
 	"github.com/zeromicro/go-zero/core/stores/redis"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"go.opentelemetry.io/otel"
 )
 
@@ -74,6 +76,23 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 
 	// redis LOCK
 	rdsLockKey := fmt.Sprintf("user:%d", req.Id)
+
+	// transaction
+	if err := l.svcCtx.UserModel.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
+		_, err := l.svcCtx.UserModel.TransactInsert(ctx, session, &model.User{
+			Id:       uint64(req.Id),
+			Name:     sql.NullString{String: req.Username, Valid: true},
+			Password: sql.NullString{String: req.Password, Valid: true},
+		})
+		if err != nil {
+			return err
+		}
+		logc.Infof(ctx, "插入数据user inserted: ID=%d, Name=%s", req.Id, req.Username)
+		return nil
+	}); err != nil {
+		logc.Errorf(l.ctx, "插入数据失败: %v", err)
+		return nil, err
+	}
 
 	var user *model.User
 
