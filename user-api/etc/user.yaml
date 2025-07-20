@@ -4,6 +4,15 @@ Port: 8888
 
 DB:
   DataSource: root:root@tcp(127.0.0.1:3306)/looklook_usercenter?parseTime=true&loc=Asia%2FShanghai
+# Mysql 缓存的redis
+Cache:
+  - Host: 127.0.0.1:6379
+    Type: node
+
+# 进行redis操作的 - 比如锁
+Redis:
+  Host: 127.0.0.1:6379
+  Type: node
 
 Prometheus:
   Host: 0.0.0.0

@@ -1,5 +1,7 @@
 version: '3.8'
 
+# docker-compose up -d
+# docker-compose down
 services:
   mysql:
     image: mysql:8
@@ -15,6 +17,15 @@ services:
       - ./mysql_data:/var/lib/mysql
     # 注意：MySQL 8.4+ 已移除 default-authentication-plugin 参数
     # 如需兼容老客户端，请使用 mysql_native_password 插件连接
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
 
   # Prometheus 监控服务
   prometheus:
