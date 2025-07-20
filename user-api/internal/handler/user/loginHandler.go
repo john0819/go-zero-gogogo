@@ -3,10 +3,11 @@ package user
 import (
 	"net/http"
 
-	"github.com/zeromicro/go-zero/rest/httpx"
 	"zero-demo/user-api/internal/logic/user"
 	"zero-demo/user-api/internal/svc"
 	"zero-demo/user-api/internal/types"
+
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 // 获取用户信息

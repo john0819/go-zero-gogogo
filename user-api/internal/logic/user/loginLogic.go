@@ -14,6 +14,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/metric"
 	"github.com/zeromicro/go-zero/core/stores/redis"
+	"go.opentelemetry.io/otel"
 )
 
 var (
@@ -24,6 +25,8 @@ var (
 		Help:      "Total number of login attempts",
 		Labels:    []string{"status"},
 	})
+
+	tracer = otel.Tracer("user-login")
 )
 
 type LoginLogic struct {
@@ -65,10 +68,16 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 	logc.Infof(l.ctx, "enter login logic")
 	logc.Infof(l.ctx, "querying user with ID: %d", req.Id)
 
+	// 分布式追踪 - 创建span用于业务逻辑追踪
+	_, span := tracer.Start(l.ctx, "user.login")
+	defer span.End()
+
+	// redis LOCK
 	rdsLockKey := fmt.Sprintf("user:%d", req.Id)
 
 	var user *model.User
 
+	_, lockSpan := tracer.Start(l.ctx, "user.lock")
 	err = l.WithRedisLock(l.ctx, rdsLockKey, func() error {
 		logc.Infof(l.ctx, "获取锁成功")
 
@@ -78,6 +87,15 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 		}
 		return nil
 	})
+	lockSpan.End()
+
+	if err != nil {
+		if err == model.ErrNotFound {
+			logc.Infof(l.ctx, "user not found in database, ID: %d", req.Id)
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
 
 	logc.Infof(l.ctx, "user found: ID=%d, Name=%s", user.Id, user.Name.String)
 	return &types.LoginResp{
