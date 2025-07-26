@@ -27,11 +27,12 @@ func NewTestLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TestLogic {
 }
 
 func (l *TestLogic) Test(req *types.TestReq) (resp *types.TestResp, err error) {
-	if err := l.TestOne(); err != nil {
-		logx.Errorf("error : %+v", err)
-	}
+	// if err := l.TestOne(); err != nil {
+	// 	logx.Errorf("error : %+v", err)
+	// }
 
 	logc.Infof(l.ctx, "enter test logic")
+	logc.Errorf(l.ctx, "enter test logic error")
 
 	return &types.TestResp{
 		Success: true,

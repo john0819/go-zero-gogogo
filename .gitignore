@@ -36,3 +36,6 @@ mysql_data/
 # Config files with sensitive data (optional)
 # *.yaml
 # *.yml 
+
+# deploy
+deploy/
