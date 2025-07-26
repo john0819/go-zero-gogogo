@@ -23,13 +23,21 @@ type (
 	UpdateResp {
 		Success int64 `json:"success"`
 	}
+	// test
+	TestReq {
+		Uid int64 `json:"uid"`
+	}
+	TestResp {
+		Success bool `json:"success"`
+	}
 )
 
 // 定义 HTTP 服务
 // 将handler放在某个分组文件夹下
 @server (
-	group:  user
-	prefix: userapi/v1
+	group:      user
+	prefix:     userapi/v1
+	middleware: TestMiddleware
 )
 service user {
 	@doc "获取用户信息"
@@ -44,5 +52,8 @@ service user {
 
 	@handler Update
 	post /user/update (UpdateReq) returns (UpdateResp)
+
+	@handler Test
+	post /user/test (TestReq) returns (TestResp)
 }
 

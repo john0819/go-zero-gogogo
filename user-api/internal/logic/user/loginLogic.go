@@ -91,7 +91,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 	// transaction
 	if err := l.svcCtx.UserModel.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
 		_, err := l.svcCtx.UserModel.TransactInsert(ctx, session, &model.User{
-			Id:       uint64(req.Id),
+			// Id:       uint64(req.Id),
 			Name:     sql.NullString{String: req.Username, Valid: true},
 			Password: sql.NullString{String: req.Password, Valid: true},
 		})

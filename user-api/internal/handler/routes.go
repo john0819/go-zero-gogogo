@@ -14,19 +14,27 @@ import (
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				// 获取用户信息
-				Method:  http.MethodPost,
-				Path:    "/user/login",
-				Handler: user.LoginHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/user/update",
-				Handler: user.UpdateHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.TestMiddleware},
+			[]rest.Route{
+				{
+					// 获取用户信息
+					Method:  http.MethodPost,
+					Path:    "/user/login",
+					Handler: user.LoginHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/user/test",
+					Handler: user.TestHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/user/update",
+					Handler: user.UpdateHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithPrefix("/userapi/v1"),
 	)
 }

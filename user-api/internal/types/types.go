@@ -16,6 +16,14 @@ type LoginResp struct {
 	ExpireAt string `json:"expireAt"`
 }
 
+type TestReq struct {
+	Uid int64 `json:"uid"`
+}
+
+type TestResp struct {
+	Success bool `json:"success"`
+}
+
 type UpdateReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`

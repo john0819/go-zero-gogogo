@@ -6,8 +6,15 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+type TraceMiddleware struct {
+}
+
+func NewTraceMiddleware() *TraceMiddleware {
+	return &TraceMiddleware{}
+}
+
 // TraceMiddleware 统一处理trace ID响应头设置
-func TraceMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func (m *TraceMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// 获取trace ID并设置到响应头
 		spanCtx := trace.SpanContextFromContext(r.Context())

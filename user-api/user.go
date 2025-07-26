@@ -26,7 +26,7 @@ func main() {
 	defer server.Stop()
 
 	// 注册trace中间件
-	server.Use(middleware.TraceMiddleware)
+	server.Use(middleware.NewTraceMiddleware().Handle)
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
