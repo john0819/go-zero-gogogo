@@ -2,11 +2,13 @@ package user
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/pkg/errors"
 
 	"zero-demo/user-api/internal/svc"
 	"zero-demo/user-api/internal/types"
 
+	"github.com/zeromicro/go-zero/core/logc"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -25,9 +27,25 @@ func NewTestLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TestLogic {
 }
 
 func (l *TestLogic) Test(req *types.TestReq) (resp *types.TestResp, err error) {
-	fmt.Println("enter test logic")
+	if err := l.TestOne(); err != nil {
+		logx.Errorf("error : %+v", err)
+	}
+
+	logc.Infof(l.ctx, "enter test logic")
 
 	return &types.TestResp{
 		Success: true,
 	}, nil
+}
+
+func (l *TestLogic) TestOne() error {
+	return l.TestTwo()
+}
+
+func (l *TestLogic) TestTwo() error {
+	return l.TestThree()
+}
+
+func (l *TestLogic) TestThree() error {
+	return errors.Wrap(errors.New("test three error"), "test three error")
 }
